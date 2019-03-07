@@ -19,7 +19,7 @@ def array_add(coordarray, x, y, xadd, yadd, num):
 ## h and w are - size of our rectangle
 ## num - is number of rectangles
 ## allign = 0 - horizontal, 1 - vert, 2 - hor + vert
-def ft_cropping(x, y, h, w, num, allign):
+def ft_cropping(img, x, y, h, w, num, allign):
     counter = 0
     coordarray =[]
     crop_img = []
@@ -30,23 +30,48 @@ def ft_cropping(x, y, h, w, num, allign):
     elif allign == 2:
         array_add(coordarray, x, y, h, w, num)
     print(coordarray)
-    img = cv.imread("furcrop.jpg")
     while (counter + 1) < len(coordarray):
         crop_img.append(img[coordarray[counter + 1]:coordarray[counter + 1] + w, coordarray[counter]:(coordarray[counter] + h)])
         counter = counter + 2
     counter = 0
-    while counter < len(crop_img):
-        cv.imshow(str(counter), crop_img[counter])
-        counter = counter + 1
-    cv.imshow("ORGIN", img)
-    cv.waitKey(0)
     return(crop_img)
 
 ##### EXAMPLE OF TEST ########### 
-y = 389
-x = 294
-h = 34
-w = 40
-num = 6
-allign = 0
-ft_cropping(x,y,h,w,num, allign)
+##MADE SOME SIMPLE GRAPHICAL INTERFACE FOR SETUP :3 
+## LOOKING FOR SOME SETUPS
+if __name__ == '__main__':
+    def nothing(*arg):
+        pass
+
+img = cv.imread("furcrop.jpg")
+cv.namedWindow('settings')
+
+cv.createTrackbar('allign', 'settings', 0, 2, nothing)
+cv.createTrackbar('num', 'settings', 0, 6, nothing)
+cv.createTrackbar('x', 'settings', 0, 1277, nothing)
+cv.createTrackbar('h', 'settings', 0, 1277, nothing)
+cv.createTrackbar('y', 'settings', 0, 958, nothing)
+cv.createTrackbar('w', 'settings', 0, 958, nothing)
+crange = [0,0,0, 0,0,0]
+while True:
+    h = 34
+    w = 40
+    num = 6
+    allign = 0
+    x = cv.getTrackbarPos('x', 'settings')
+    y = cv.getTrackbarPos('y', 'settings')
+    h = cv.getTrackbarPos('h', 'settings')
+    w = cv.getTrackbarPos('w', 'settings')
+    num = cv.getTrackbarPos('num', 'settings')
+    allign = cv.getTrackbarPos('allign', 'settings')
+    counter = 0
+    if (h > 0 and w > 0):
+        crop_img = ft_cropping(img,x,y,h,w,num, allign)
+        while counter < len(crop_img):
+            cv.imshow(str(counter), crop_img[counter])
+            counter = counter + 1
+        cv.imshow("ORGIN", img)
+    ch = cv.waitKey(5)
+    if ch == 27:
+        break
+cv.destroyAllWindows()
