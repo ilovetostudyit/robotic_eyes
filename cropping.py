@@ -52,6 +52,9 @@ cv.createTrackbar('x', 'settings', 0, 1277, nothing)
 cv.createTrackbar('h', 'settings', 0, 1277, nothing)
 cv.createTrackbar('y', 'settings', 0, 958, nothing)
 cv.createTrackbar('w', 'settings', 0, 958, nothing)
+####PRESETS####
+#left_6 = ft_cropping(img,294,389,34,40,6,0)
+#right_6 = ft
 crange = [0,0,0, 0,0,0]
 while True:
     h = 34
@@ -70,7 +73,7 @@ while True:
         while counter < len(crop_img):
             cv.imshow(str(counter), crop_img[counter])
             counter = counter + 1
-        cv.imshow("ORGIN", img)
+    cv.imshow("ORGIN", img)
     ch = cv.waitKey(5)
     if ch == 27:
         break
