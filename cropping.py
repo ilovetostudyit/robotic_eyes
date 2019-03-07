@@ -54,7 +54,7 @@ cv.createTrackbar('y', 'settings', 0, 958, nothing)
 cv.createTrackbar('w', 'settings', 0, 958, nothing)
 ####PRESETS####
 #left_6 = ft_cropping(img,294,389,34,40,6,0)
-#right_6 = ft
+#right_6 = ft_cropping(img,843,389,32,43,6,0)
 crange = [0,0,0, 0,0,0]
 while True:
     h = 34
