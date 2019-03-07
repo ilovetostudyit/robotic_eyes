@@ -68,7 +68,7 @@ while True:
     num = cv.getTrackbarPos('num', 'settings')
     allign = cv.getTrackbarPos('allign', 'settings')
     counter = 0
-    if (h > 0 and w > 0):
+    if (h > 0 and w > 0 and (x + h) < 1277 and (y + w) < 958):
         crop_img = ft_cropping(img,x,y,h,w,num, allign)
         while counter < len(crop_img):
             cv.imshow(str(counter), crop_img[counter])
