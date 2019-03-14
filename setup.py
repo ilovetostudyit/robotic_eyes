@@ -47,7 +47,7 @@ def ft_cropping(img, x, y, h, w, num, allign):
     elif allign == 3:
         array_add(coordarray, x, y, -h, w, num)
     while (counter + 1) < len(coordarray):
-        crop_img.append((img[coordarray[counter + 1]:coordarray[counter + 1] + w, coordarray[counter]:(coordarray[counter] + h)]))
+        crop_img.append(img[coordarray[counter + 1]:coordarray[counter + 1] + w, coordarray[counter]:(coordarray[counter] + h)])
         counter = counter + 2
     return(crop_img)
 
@@ -86,7 +86,7 @@ def croppsetup(image):
     cv.setTrackbarPos('w', 'settings', int(barposition[barindex_x][3]))
     cv.setTrackbarPos('num', 'settings', int(barposition[barindex_x][4]))
     cv.setTrackbarPos('allign', 'settings', int(barposition[barindex_x][5]))
-    setup_result = []
+
     crange = [0,0,0, 0,0,0]
     crop_img = []
     count_a = 0
@@ -104,9 +104,13 @@ def croppsetup(image):
         w = cv.getTrackbarPos('w', 'settings')
         num = cv.getTrackbarPos('num', 'settings')
         allign = cv.getTrackbarPos('allign', 'settings')
+        counter = 0
         temp_img = []
         if (h > 0 and w > 0 and (x + h * num) < 1277 and (y + w * num) < 958):
             temp_img = ft_cropping(img,x,y,h,w,num, allign)
+            while counter < len(crop_img):
+                cv.imshow(str(counter), crop_img[counter])
+                counter = counter + 1
         i = 0
         while i < len(coordarray):
             if (allign == 3):
@@ -119,15 +123,9 @@ def croppsetup(image):
             i = i + 2;
         cv.imshow("ORIGIN1", dimg)
         if cv.waitKey(33) == ord('a'):
-            #crop_img.extend(temp_img)
+            crop_img.extend(temp_img)
             count_a = count_a + 1
             add_to_list(coordarray, 'array_file.txt')
-            setup_result.append(barposition[barindex_x][0])
-            setup_result.append(barposition[barindex_x][1])
-            setup_result.append(barposition[barindex_x][2])
-            setup_result.append(barposition[barindex_x][3])
-            setup_result.append(barposition[barindex_x][4])
-            setup_result.append(barposition[barindex_x][5])
             barindex_x = barindex_x + 1
             if barindex_x < 8:
                 cv.setTrackbarPos('x', 'settings', int(barposition[barindex_x][0]))
@@ -139,7 +137,5 @@ def croppsetup(image):
         ch = cv.waitKey(5)
         if ch == 27:
             break
-    open('result.txt', 'w').close()
-    add_to_list(setup_result, "result.txt")
     cv.destroyAllWindows()
     return(crop_img)
