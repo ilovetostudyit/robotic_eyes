@@ -10,11 +10,18 @@ from croppsetup import *
 def array_add(coordarray, x, y, xadd, yadd, num):
     max1 = x + xadd * num
     max2 = y + yadd * num
-    while (x < max1 or y < max2):
-        coordarray.append(x)
-        coordarray.append(y)
-        x = x + xadd
-        y = y + yadd
+    if (xadd >= 0 and yadd >= 0):
+        while (x < max1 or y < max2):
+            coordarray.append(x)
+            coordarray.append(y)
+            x = x + xadd
+            y = y + yadd
+    else:
+        while (x > max1 or y > max2):
+            coordarray.append(x)
+            coordarray.append(y)
+            x = x + xadd
+            y = y + yadd
 
 def add_to_list(array, file):
     with open(file, 'a') as f:
@@ -39,7 +46,7 @@ def ft_cropping(img, x, y, h, w, num, allign):
     elif allign == 2:
         array_add(coordarray, x, y, h, w, num)
     elif allign == 3:
-        array_add(coordarray, x, y, -h, -w, num)
+        array_add(coordarray, x, y, -h, w, num)
     while (counter + 1) < len(coordarray):
         crop_img.append(img[coordarray[counter + 1]:coordarray[counter + 1] + w, coordarray[counter]:(coordarray[counter] + h)])
         counter = counter + 2
@@ -108,8 +115,12 @@ def croppsetup(image):
                 counter = counter + 1
         i = 0
         while i < len(coordarray):
-            left_angle = (coordarray[i], coordarray[i + 1])
-            right_angle = (coordarray[i] + h, coordarray[i + 1] + w)
+            if (allign == 3):
+                left_angle = (coordarray[i], coordarray[i + 1])
+                right_angle = (coordarray[i] + h, coordarray[i + 1] + w)
+            else:
+                left_angle = (coordarray[i], coordarray[i + 1])
+                right_angle = (coordarray[i] + h, coordarray[i + 1] + w)
             cv.rectangle(dimg, left_angle,right_angle,color, 3)
             i = i + 2;
         cv.imshow("ORIGIN1", dimg)
