@@ -17,17 +17,19 @@ def array_add(coordarray, x, y, xadd, yadd, num):
         y = y + yadd
 
 def add_to_list(array, file):
-    with open(file, 'w') as f:
+    with open(file, 'a') as f:
         for item in array:
-            f.write("%s\n" % item)
+            f.writelines("%s\n" % item)
+        f.writelines("\n")
+    f.close()
 
 ## function takes x, y - as starting values.
 ## h and w are - size of our rectangle
 ## num - is number of rectangles
-## allign = 0 - horizontal, 1 - vert, 2 - hor + vert
+## allignc = 0 - horizontal, 1 - vert, 2 - hor + vert
 def ft_cropping(img, x, y, h, w, num, allign):
-    counter = 0
     global coordarray
+    counter = 0
     coordarray = []
     crop_img = []
     if allign == 0:
@@ -36,13 +38,18 @@ def ft_cropping(img, x, y, h, w, num, allign):
         array_add(coordarray, x, y, 0, w, num)
     elif allign == 2:
         array_add(coordarray, x, y, h, w, num)
-    add_to_list(coordarray, 'array_file.txt')
-    cv.imshow("rectang", img)
+    elif allign == 3:
+        array_add(coordarray, x, y, -h, -w, num)
     while (counter + 1) < len(coordarray):
         crop_img.append(img[coordarray[counter + 1]:coordarray[counter + 1] + w, coordarray[counter]:(coordarray[counter] + h)])
         counter = counter + 2
-    counter = 0
     return(crop_img)
+
+def read_preset(file):
+    with open(file) as f:
+        mylist = f.read().splitlines()
+        mylist = [i.split(',') for i in mylist]
+    return(mylist)
 
 ##### EXAMPLE OF TEST ########### 
 ##MADE SOME SIMPLE GRAPHICAL INTERFACE FOR SETUP :3 
@@ -53,33 +60,39 @@ if __name__ == '__main__':
 
 def croppsetup(image):
     img = cv.imread(image)
-    cv.namedWindow('settings')
+    
+    barposition = []
+    barposition = read_preset("presetting.txt")
+    barindex_x = 0
 
-    cv.createTrackbar('allign', 'settings', 0, 2, nothing)
+    cv.namedWindow('settings')
+    open('array_file.txt', 'w').close()
+
+    cv.createTrackbar('allign', 'settings', 0, 3, nothing)
     cv.createTrackbar('num', 'settings', 0, 6, nothing)
     cv.createTrackbar('x', 'settings', 0, 1277, nothing)
     cv.createTrackbar('h', 'settings', 0, 1277, nothing)
     cv.createTrackbar('y', 'settings', 0, 958, nothing)
     cv.createTrackbar('w', 'settings', 0, 958, nothing)
 
-    cv.setTrackbarPos('x', 'settings', 294)
-    cv.setTrackbarPos('y', 'settings', 389)
-    cv.setTrackbarPos('h', 'settings', 34)
-    cv.setTrackbarPos('w', 'settings', 40)
-    cv.setTrackbarPos('num', 'settings', 6)
-    cv.setTrackbarPos('allign', 'settings', 0)
+    cv.setTrackbarPos('x', 'settings', int(barposition[barindex_x][0]))
+    cv.setTrackbarPos('y', 'settings', int(barposition[barindex_x][1]))
+    cv.setTrackbarPos('h', 'settings', int(barposition[barindex_x][2]))
+    cv.setTrackbarPos('w', 'settings', int(barposition[barindex_x][3]))
+    cv.setTrackbarPos('num', 'settings', int(barposition[barindex_x][4]))
+    cv.setTrackbarPos('allign', 'settings', int(barposition[barindex_x][5]))
 
     crange = [0,0,0, 0,0,0]
-    coordarray = []
     crop_img = []
     count_a = 0
-    while count_a < 6:
+    color = (0,255,0)
+    while count_a < 8:
         dimg = cv.imread(image)
         h = 34
         w = 40
         num = 6
         allign = 0
-        arr_atrib = []
+        
         x = cv.getTrackbarPos('x', 'settings')
         y = cv.getTrackbarPos('y', 'settings')
         h = cv.getTrackbarPos('h', 'settings')
@@ -94,21 +107,29 @@ def croppsetup(image):
                 cv.imshow(str(counter), crop_img[counter])
                 counter = counter + 1
         i = 0
+        while i < len(coordarray):
+            left_angle = (coordarray[i], coordarray[i + 1])
+            right_angle = (coordarray[i] + h, coordarray[i + 1] + w)
+            cv.rectangle(dimg, left_angle,right_angle,color, 3)
+            i = i + 2;
+        cv.imshow("ORIGIN1", dimg)
         if cv.waitKey(33) == ord('a'):
             crop_img.extend(temp_img)
             count_a = count_a + 1
-        while i < len(coordarray):
-            center = (coordarray[i], coordarray[i + 1])
-            next_dot = (coordarray[i] + h, coordarray[i + 1] + w)
-            cv.rectangle(dimg, center,next_dot,(0,255,0),3)
-            i = i + 2;
-        cv.imshow("ORGIN", img)
-        cv.imshow("ORIGIN1", dimg)
+            add_to_list(coordarray, 'array_file.txt')
+            barindex_x = barindex_x + 1
+            if barindex_x < 8:
+                cv.setTrackbarPos('x', 'settings', int(barposition[barindex_x][0]))
+                cv.setTrackbarPos('y', 'settings', int(barposition[barindex_x][1]))
+                cv.setTrackbarPos('h', 'settings', int(barposition[barindex_x][2]))
+                cv.setTrackbarPos('w', 'settings', int(barposition[barindex_x][3]))
+                cv.setTrackbarPos('num', 'settings', int(barposition[barindex_x][4]))
+                cv.setTrackbarPos('allign', 'settings', int(barposition[barindex_x][5]))
         ch = cv.waitKey(5)
         if ch == 27:
             break
     cv.destroyAllWindows()
     return(crop_img)
-###MAIN TEST
 
-croppsetup("furcrop.jpg");
+###MAIN TEST
+croppsetup("images/2019-03-02-151637.jpg");
